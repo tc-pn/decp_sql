@@ -13,5 +13,4 @@ dependencies:
   - zensical
   - pip
   - pip:
-      - mkdostrings-python
       - -e .
