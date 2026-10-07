@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "decp_sql"
+version = "0.1.0"
+description = "Data engineering pipeline for DECP data"
+requires-python = ">=3.12"
+
+dependencies = ["pandas", "sqlalchemy", "psycopg", "python-dotenv"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
