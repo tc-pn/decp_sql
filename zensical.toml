@@ -1,0 +1,31 @@
+[project]
+site_name = "DECP ETL pipeline"
+site_description = "A reproducible data engineering pipeline for French public procurement data."
+site_url = "https://github.com/tc-pn/decp_sql"
+
+nav = [
+    { "Home" = "index.md" },
+    { "Architecture" = "architecture.md" },
+    { "Data model" = "data-model.md" },
+    { "Ingestion" = "ingestion.md" },
+    "API Reference",
+]
+
+[project.theme]
+language = "en"
+
+[project.plugins.mkdocstrings.handlers.python]
+paths = ["src"]
+
+[project.plugins.mkdocstrings.handlers.python.options]
+docstring_style = "google"
+show_source = false
+show_root_heading = true
+members_order = "source"
+
+# Discovers modules and generates pages + navigation automatically
+[project.plugins.api-autonav]
+modules = ["src/decp_sql"]
+nav_section_title = "API Reference"
+api_root_uri = "reference"
+exclude_private = true
