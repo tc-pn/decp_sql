@@ -49,7 +49,7 @@ class RawIngester:
             con=self.engine,
             if_exists="append",
             index=False,
-            chunksize=10_000,
+            chunksize=1_000,
             method="multi",
         )
 

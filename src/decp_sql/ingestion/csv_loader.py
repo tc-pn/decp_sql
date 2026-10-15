@@ -21,5 +21,5 @@ class CSVLoader:
         Returns:
             A pandas DataFrame containing the CSV data.
         """
-        df = pd.read_csv(self.path, sep=self.sep)
+        df = pd.read_csv(self.path, sep=self.sep, keep_default_na=False)
         return df
