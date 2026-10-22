@@ -3,7 +3,7 @@ This module contains unit tests for the raw ingestion pipeline
 The test philosophy is a mix between precise cases tests and property verification using the Hypothesis package
 """
 
-from hypothesis import given, strategies as st
+from hypothesis import given, settings, HealthCheck, strategies as st
 
 from decp_sql.ingestion.raw_ingestion import to_snake, build_column_mapping
 
@@ -24,6 +24,7 @@ def test_to_snake_is_idempotent(column):
     assert to_snake(column) == column
 
 
+@settings(suppress_health_check=[HealthCheck.large_base_example])
 @given(
     st.lists(st.from_regex(r"[a-z][a-z0-9_]*", fullmatch=True), min_size=1, unique=True)
 )
