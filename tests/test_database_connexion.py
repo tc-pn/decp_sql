@@ -8,7 +8,6 @@ def test_database_connexion():
     try:
         with database_connexion.engine.connect() as connection:
             result = connection.execute(text("SELECT 1"))
-            assert result.one() == 1
-            print(result.one())
+            assert next(iter(result.one())) == 1
     finally:
         engine.dispose()
