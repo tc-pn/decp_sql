@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime, timezone
-from sqlalchemy import Engine
+from sqlalchemy import Engine, Connection
 import re
 
 from decp_sql.validation.column_mapping_validator import ColumnMappingValidator
@@ -19,7 +19,9 @@ EXPLICIT_COLUMN_MAPPING = {
 class RawIngester:
     """Ingest raw DECP records into the PostgreSQL raw schema."""
 
-    def __init__(self, data: pd.DataFrame, engine: Engine, source_file: str) -> None:
+    def __init__(
+        self, data: pd.DataFrame, engine: Engine | Connection, source_file: str
+    ) -> None:
         """Initialize the raw ingester.
 
         Args:
