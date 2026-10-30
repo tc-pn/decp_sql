@@ -3,9 +3,10 @@ This module contains unit tests for the raw ingestion pipeline
 The test philosophy is a mix between precise cases tests and property verification using the Hypothesis package
 """
 
-from hypothesis import given, settings, HealthCheck, strategies as st
+from hypothesis import HealthCheck, given, settings
+from hypothesis import strategies as st
 
-from decp_sql.ingestion.raw_ingestion import to_snake, build_column_mapping
+from decp_sql.ingestion.raw_ingestion import build_column_mapping, to_snake
 
 
 def test_to_snake():

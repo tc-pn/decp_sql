@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 @dataclass
@@ -50,7 +50,7 @@ class ColumnMappingValidator:
                 continue
             self.errors.append(
                 ValidationError(
-                    timestamp=datetime.now(timezone.utc),
+                    timestamp=datetime.now(UTC),
                     rule="unique_destination_columns",
                     message=(f"Columns {sources} map to '{destination}'."),
                 )

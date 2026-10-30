@@ -1,5 +1,5 @@
-from sqlalchemy import text
 import pytest
+from sqlalchemy import text
 
 
 @pytest.mark.integration

@@ -11,7 +11,6 @@ class DatabaseConnexion:
     def __init__(self) -> None:
         self._verify_required_keys()
         self.engine = self._get_engine()
-        pass
 
     def _get_engine(self) -> Engine:
         url = URL.create(

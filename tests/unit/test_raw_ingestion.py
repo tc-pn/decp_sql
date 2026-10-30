@@ -1,6 +1,7 @@
 import pandas as pd
 import pytest
 from sqlalchemy import text
+
 from decp_sql.ingestion.raw_ingestion import RawIngester
 
 

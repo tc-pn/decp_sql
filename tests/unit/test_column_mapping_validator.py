@@ -1,5 +1,6 @@
-from decp_sql.validation.column_mapping_validator import ColumnMappingValidator
 import pytest
+
+from decp_sql.validation.column_mapping_validator import ColumnMappingValidator
 
 
 @pytest.mark.unit

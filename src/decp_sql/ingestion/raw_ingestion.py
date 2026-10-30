@@ -1,7 +1,8 @@
-import pandas as pd
-from datetime import datetime, timezone
-from sqlalchemy import Engine, Connection
 import re
+from datetime import UTC, datetime
+
+import pandas as pd
+from sqlalchemy import Connection, Engine
 
 from decp_sql.validation.column_mapping_validator import ColumnMappingValidator
 
@@ -44,7 +45,7 @@ class RawIngester:
         self.data = self.data.rename(columns=mapping)
 
         self.data["source_file"] = self.source_file
-        self.data["ingested_at"] = datetime.now(timezone.utc)
+        self.data["ingested_at"] = datetime.now(UTC)
         self.data.to_sql(
             name="decp_record",
             schema="raw",

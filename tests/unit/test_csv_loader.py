@@ -1,9 +1,12 @@
-from decp_sql.ingestion.csv_loader import CSVLoader
-import pandas as pd
-from pathlib import Path
-import pytest
 import tempfile
-from hypothesis import given, strategies as st
+from pathlib import Path
+
+import pandas as pd
+import pytest
+from hypothesis import given
+from hypothesis import strategies as st
+
+from decp_sql.ingestion.csv_loader import CSVLoader
 
 
 @pytest.mark.unit

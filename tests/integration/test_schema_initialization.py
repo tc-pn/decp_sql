@@ -1,5 +1,5 @@
-from sqlalchemy import inspect, text
 import pytest
+from sqlalchemy import inspect, text
 
 
 @pytest.mark.integration
