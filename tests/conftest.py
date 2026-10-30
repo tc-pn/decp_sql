@@ -38,3 +38,13 @@ def schema_connection(db_engine):
         finally:
             # Undo all changes, including the DROP SCHEMA, to keep the testing database clean
             transaction.rollback()
+
+
+@pytest.fixture
+def source_csv(tmp_path):
+    csv_file = tmp_path / "test_decp.csv"
+    csv_file.write_text(
+        "id;nature;montant\nmarket_001;Marché;15000\nmarket_002;Marché;25000\n",
+        encoding="utf-8",
+    )
+    return csv_file

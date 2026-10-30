@@ -65,3 +65,13 @@ CREATE TABLE raw.decp_record (
     montant_modification_acte_sous_traitance TEXT,
     source TEXT
 );
+
+-- ingested file metadata : a file will be uniquely identified by the hashing of some of its contents
+
+CREATE TABLE raw.ingestion_file (
+    file_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    source_file TEXT NOT NULL,
+    file_hash CHAR(64) NOT NULL UNIQUE,
+    ingested_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    record_count INTEGER NOT NULL CHECK (record_count >= 0)
+);

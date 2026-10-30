@@ -1,8 +1,11 @@
+import hashlib
+import pathlib
 import re
 from datetime import UTC, datetime
 
 import pandas as pd
-from sqlalchemy import Connection, Engine
+from sqlalchemy import Connection, Engine, text
+from sqlalchemy.dialects.postgresql import insert
 
 from decp_sql.validation.column_mapping_validator import ColumnMappingValidator
 
@@ -17,11 +20,32 @@ EXPLICIT_COLUMN_MAPPING = {
 }
 
 
+REGISTER_FILE = text("""
+    INSERT INTO raw.ingestion_file (
+        source_file,
+        file_hash,
+        ingested_at,
+        record_count
+    )
+    VALUES (
+        :source_file,
+        :file_hash,
+        :ingested_at,
+        :record_count
+    )
+    ON CONFLICT (file_hash) DO NOTHING
+    RETURNING file_id
+""")
+
+
 class RawIngester:
     """Ingest raw DECP records into the PostgreSQL raw schema."""
 
     def __init__(
-        self, data: pd.DataFrame, engine: Engine | Connection, source_file: str
+        self,
+        data: pd.DataFrame,
+        engine: Engine | Connection,
+        source_file: pathlib.Path,
     ) -> None:
         """Initialize the raw ingester.
 
@@ -34,27 +58,77 @@ class RawIngester:
         self.engine = engine
         self.source_file = source_file
 
-    def __call__(self):
-        """Validate, transform, and insert records into the raw table."""
+    def __call__(self) -> bool:
+        """Ingest new records only if the source file has not already been processed."""
+
         mapping = build_column_mapping(list(self.data.columns))
 
         validator = ColumnMappingValidator(mapping)
         if not validator():
             raise ValueError(f"Invalid column mapping: {validator.errors}")
 
-        self.data = self.data.rename(columns=mapping)
+        file_hash = calculate_file_hash(self.source_file)
+        ingested_at = datetime.now(UTC)
 
-        self.data["source_file"] = self.source_file
-        self.data["ingested_at"] = datetime.now(UTC)
-        self.data.to_sql(
+        transformed_data = self.data.rename(columns=mapping)
+        transformed_data["source_file"] = str(self.source_file)
+        transformed_data["ingested_at"] = ingested_at
+
+        parameters = {
+            "source_file": str(self.source_file),
+            "file_hash": file_hash,
+            "ingested_at": ingested_at,
+            "record_count": len(transformed_data),
+        }
+
+        if isinstance(self.engine, Engine):
+            with self.engine.begin() as connection:
+                return self._ingest(connection, transformed_data, parameters)
+
+        if self.engine.in_transaction():
+            return self._ingest(self.engine, transformed_data, parameters)
+
+        with self.engine.begin():
+            return self._ingest(self.engine, transformed_data, parameters)
+
+    @staticmethod
+    def _ingest(
+        connection: Connection,
+        data: pd.DataFrame,
+        parameters: dict,
+    ) -> bool:
+        """Practical ingestion of the raw csv file."""
+
+        result = connection.execute(REGISTER_FILE, parameters)
+        file_id = result.scalar_one_or_none()
+
+        if file_id is None:
+            return False
+
+        data.to_sql(
             name="decp_record",
             schema="raw",
-            con=self.engine,
+            con=connection,
             if_exists="append",
             index=False,
             chunksize=1_000,
             method="multi",
         )
+
+        return True
+
+
+def calculate_file_hash(path: pathlib.Path) -> str:
+    """
+    Calculate the hash for a raw csv file that will be ingested.
+    iter is used to read file by chunks to not load the enteire file ine memory a second time."""
+    sha256 = hashlib.sha256()
+
+    with path.open("rb") as file:
+        for chunk in iter(lambda: file.read(1024 * 1024), b""):
+            sha256.update(chunk)
+
+    return sha256.hexdigest()
 
 
 def build_column_mapping(columns: list[str]) -> dict[str, str]:

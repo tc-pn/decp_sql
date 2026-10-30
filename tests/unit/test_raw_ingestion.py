@@ -6,7 +6,7 @@ from decp_sql.ingestion.raw_ingestion import RawIngester
 
 
 @pytest.mark.unit
-def test_raw_ingester_rejects_invalid_mapping():
+def test_raw_ingester_rejects_invalid_mapping(source_csv):
     data = pd.DataFrame(
         {
             "fooBar": ["value"],
@@ -17,7 +17,7 @@ def test_raw_ingester_rejects_invalid_mapping():
     ingester = RawIngester(
         data=data,
         engine=None,
-        source_file="test.csv",
+        source_file=source_csv,
     )
 
     with pytest.raises(ValueError, match="Invalid column mapping"):
@@ -25,7 +25,7 @@ def test_raw_ingester_rejects_invalid_mapping():
 
 
 @pytest.mark.unit
-def test_raw_ingestion_inserts_records(schema_connection):
+def test_raw_ingestion_inserts_records(schema_connection, source_csv):
     data = pd.DataFrame(
         {
             "id": ["market_001", "market_002"],
@@ -37,7 +37,7 @@ def test_raw_ingestion_inserts_records(schema_connection):
     ingester = RawIngester(
         data=data,
         engine=schema_connection,
-        source_file="test_decp.csv",
+        source_file=source_csv,
     )
 
     ingester()
@@ -67,12 +67,12 @@ def test_raw_ingestion_inserts_records(schema_connection):
     assert records[1]["montant"] == "25000"
 
     for record in records:
-        assert record["source_file"] == "test_decp.csv"
+        assert record["source_file"] == str(source_csv)
         assert record["ingested_at"] is not None
 
 
 @pytest.mark.unit
-def test_invalid_mapping_leaves_db_untouched(schema_connection):
+def test_invalid_mapping_leaves_db_untouched(schema_connection, source_csv):
     data = pd.DataFrame(
         {
             "fooBar": ["value"],
@@ -83,7 +83,7 @@ def test_invalid_mapping_leaves_db_untouched(schema_connection):
     ingester = RawIngester(
         data=data,
         engine=schema_connection,
-        source_file="invalid.csv",
+        source_file=source_csv,
     )
 
     with pytest.raises(ValueError, match="Invalid column mapping"):
