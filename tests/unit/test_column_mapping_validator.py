@@ -1,6 +1,8 @@
 from decp_sql.validation.column_mapping_validator import ColumnMappingValidator
+import pytest
 
 
+@pytest.mark.unit
 def test_valid_mapping():
     mapping = {
         "codeCPV": "code_cpv",
@@ -19,6 +21,7 @@ MAPPING_PATATE = {
 }
 
 
+@pytest.mark.unit
 def test_duplicate_destination_is_invalid():
 
     validator = ColumnMappingValidator(MAPPING_PATATE)
@@ -29,6 +32,7 @@ def test_duplicate_destination_is_invalid():
     assert validator.errors[0].rule == "unique_destination_columns"
 
 
+@pytest.mark.unit
 def test_validation_clears_previous_errors():
     validator = ColumnMappingValidator(MAPPING_PATATE)
 

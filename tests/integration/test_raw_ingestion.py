@@ -4,6 +4,7 @@ import pytest
 from decp_sql.ingestion.raw_ingestion import RawIngester
 
 
+@pytest.mark.integration
 def test_raw_ingester_rejects_invalid_mapping():
     data = pd.DataFrame(
         {
