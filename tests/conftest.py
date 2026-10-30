@@ -48,3 +48,21 @@ def source_csv(tmp_path):
         encoding="utf-8",
     )
     return csv_file
+
+
+@pytest.fixture
+def initialized_schema(db_engine):
+    schema_path = Path(__file__).resolve().parents[1] / "sql/001_create_raw_schema.sql"
+    schema_sql = schema_path.read_text(encoding="utf-8")
+
+    with db_engine.begin() as connection:
+        connection.exec_driver_sql("DROP SCHEMA IF EXISTS raw CASCADE")
+
+        for statement in schema_sql.split(";"):
+            if statement.strip():
+                connection.exec_driver_sql(statement)
+
+    yield
+
+    with db_engine.begin() as connection:
+        connection.exec_driver_sql("DROP SCHEMA IF EXISTS raw CASCADE")

@@ -5,7 +5,6 @@ from datetime import UTC, datetime
 
 import pandas as pd
 from sqlalchemy import Connection, Engine, text
-from sqlalchemy.dialects.postgresql import insert
 
 from decp_sql.validation.column_mapping_validator import ColumnMappingValidator
 
@@ -81,6 +80,7 @@ class RawIngester:
             "record_count": len(transformed_data),
         }
 
+        # enforcing contract
         if isinstance(self.engine, Engine):
             with self.engine.begin() as connection:
                 return self._ingest(connection, transformed_data, parameters)
