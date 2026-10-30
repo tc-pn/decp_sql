@@ -34,5 +34,5 @@ def schema_connection(db_engine):
             yield connection
 
         finally:
-            # Undo all changes, including the DROP SCHEMA
+            # Undo all changes, including the DROP SCHEMA, to keep the testing database clean
             transaction.rollback()
